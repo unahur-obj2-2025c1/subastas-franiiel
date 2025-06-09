@@ -7,17 +7,19 @@ public class Subastador implements Observer {
 	private String usuario;
 	private Oferta ultimaOferta;
 	private ProductoSubastado producto;
+	private Estrategia tipoSubastador;
 	
-	public Subastador(String nombre, Oferta ultimaOferta, ProductoSubastado producto) {
+	public Subastador(String nombre, Oferta ultimaOferta, ProductoSubastado producto, Estrategia tipoSubastador) {
 		this.usuario = nombre;
 		this.ultimaOferta = ultimaOferta;
 		this.producto = producto;
-	}
+		this.tipoSubastador = tipoSubastador;	
+		}
 	public String getUsuario() {
 		return usuario;
 	}
 	public void realizarOferta() {
-		producto.agregarOferta(new Oferta(this, ultimaOferta.getValor() + 10));
+		producto.agregarOferta(tipoSubastador.getEstrategia(this, ultimaOferta.getValor() + 10));
 	}
 	
 	@Override
@@ -28,5 +30,9 @@ public class Subastador implements Observer {
 		
 		return ultimaOferta;
 	}
-
+	
+	public void nuevoTipoSubastador(Estrategia nuevoTipo) {
+		this.tipoSubastador = nuevoTipo;
+	}
+	
 }

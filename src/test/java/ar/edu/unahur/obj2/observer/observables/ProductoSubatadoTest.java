@@ -6,7 +6,11 @@ import org.junit.jupiter.api.Test;
 
 import ar.edu.unahur.obj2.observer.Oferta;
 import ar.edu.unahur.obj2.observer.excepciones.OfertaSubastadorException;
+import ar.edu.unahur.obj2.observer.observadores.Arriesgado;
+import ar.edu.unahur.obj2.observer.observadores.Estrategia;
+import ar.edu.unahur.obj2.observer.observadores.Limite;
 import ar.edu.unahur.obj2.observer.observadores.Subastador;
+import ar.edu.unahur.obj2.observer.observadores.Unico;
 
 class ProductoSubatadoTest {
 	
@@ -14,27 +18,27 @@ class ProductoSubatadoTest {
 	    private Subastador gonzager;
 	    private Subastador martomau;
 	    private Subastador diazdan;
+	    private Estrategia limite;
+	    private Estrategia arriesgado;
+	    private Estrategia unico;
 
 	    @BeforeEach
 	    public void setUp() {
 	        producto = new ProductoSubastado();
+	        limite = new Limite(40);
+	        arriesgado = new Arriesgado();
+	        unico = new Unico();
+	        
 
-	        gonzager = new Subastador("gonzager", new Oferta(null, 0), producto);
-	        martomau = new Subastador("martomau", new Oferta(null, 0), producto);
-	        diazdan  = new Subastador("diazdan",  new Oferta(null, 0), producto);
+	        gonzager = new Subastador("gonzager", new Oferta(null, 0), producto, limite);
+	        martomau = new Subastador("martomau", new Oferta(null, 0), producto, limite);
+	        diazdan  = new Subastador("diazdan",  new Oferta(null, 0), producto, unico);
 
 	        producto.agregarSubastador(gonzager);
 	        producto.agregarSubastador(martomau);
 
-	        martomau.actualizar(new Oferta(martomau, 0));
 	        martomau.realizarOferta(); 
-
-	        
-	        gonzager.actualizar(new Oferta(gonzager, 10));
 	        gonzager.realizarOferta(); 
-
-	        
-	        martomau.actualizar(new Oferta(martomau, 20));
 	        martomau.realizarOferta(); 
 	    }
 
@@ -69,6 +73,25 @@ class ProductoSubatadoTest {
 	            diazdan.realizarOferta();
 	        });
 	        assertEquals("El subastador no participa en la subasta", e.getMessage());
+	    }
+	    
+	    @Test
+	    public void test6_cambioDeTipoDeLimiteHaciaArriesgadoLaUltimaOfertaDebeSer50() {
+	    	gonzager.nuevoTipoSubastador(arriesgado);
+	    	gonzager.realizarOferta();
+	    	Oferta ultima = producto.ultimaOferta();
+		    assertEquals(50, ultima.getValor());
+	    }
+	    @Test
+	    public void test6_SubastadorTipoUnicoRealizarMasDe1OfertaLanzaExcepcion() {
+	    	producto.agregarSubastador(diazdan);
+	    	diazdan.realizarOferta();
+	    	 
+	    	
+	    	 Exception e = assertThrows(RuntimeException.class, () -> {
+		            diazdan.realizarOferta();
+		        });
+	    	 assertEquals("El subastador ya realizo una oferta", e.getMessage());
 	    }
 	}
 
