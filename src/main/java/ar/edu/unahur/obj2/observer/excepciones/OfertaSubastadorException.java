@@ -4,5 +4,4 @@ public class OfertaSubastadorException extends RuntimeException {
     public OfertaSubastadorException(String message) {
         super(message);
     }
-
 }
